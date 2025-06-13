@@ -41,7 +41,7 @@
 #define CLOCK_INVALID -1
 #endif  // CLOCK_INVALID
 
-inline clockid_t GetDateTime(struct timespec *ts)
+inline clockid_t GetPtpTime(struct timespec *ts)
 {
     static clockid_t clkid = CLOCK_INVALID;
     if (clkid == CLOCK_INVALID) {
@@ -65,17 +65,33 @@ inline clockid_t GetDateTime(struct timespec *ts)
     return clkid;
 }
 
+void PrintTime(struct timespec ts) {
+    time_t seconds = ts.tv_sec;
+    struct tm *tm_info = localtime(&seconds);
+    std::cout << tm_info->tm_year + 1900 << "-"
+              << tm_info->tm_mon + 1 << "-"
+              << tm_info->tm_mday << " "
+              << tm_info->tm_hour << ":"
+              << tm_info->tm_min << ":"
+              << tm_info->tm_sec
+              << std::endl;
+}
+
 int main() {
 
     struct timespec ts;
-    clockid_t clkid = GetDateTime(&ts);
+    clockid_t clkid = GetPtpTime(&ts);
     if (clkid == CLOCK_INVALID) {
         std::cerr << "Failed to get clock ID" << std::endl;
         return 1;
     }
+    std::cout << "ptp time: " << ts.tv_sec << "s " << ts.tv_nsec << "ns" << std::endl;
+    PrintTime(ts);
 
-    std::cout << "Clock ID: " << clkid << std::endl;
-    std::cout << "Current time: " << ts.tv_sec << " seconds, " << ts.tv_nsec << " nanoseconds" << std::endl;
+    struct timespec ts2;
+    clock_gettime(CLOCK_REALTIME, &ts2);
+    std::cout << "real time: " << ts2.tv_sec << "s " << ts2.tv_nsec << "ns" << std::endl;
+    PrintTime(ts2);
 
     return 0;
 }
