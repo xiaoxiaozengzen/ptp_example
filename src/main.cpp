@@ -93,5 +93,13 @@ int main() {
     std::cout << "real time: " << ts2.tv_sec << "s " << ts2.tv_nsec << "ns" << std::endl;
     PrintTime(ts2);
 
+    struct timespec ts3;
+    std::chrono::nanoseconds duration_ns = std::chrono::system_clock::now().time_since_epoch();
+    ts3.tv_sec = std::chrono::duration_cast<std::chrono::seconds>(duration_ns).count();
+    ts3.tv_nsec = duration_ns.count() % 1000000000;
+    std::cout << "system clock time: " << ts3.tv_sec << "s " << ts3.tv_nsec << "ns" << std::endl;
+    PrintTime(ts3);
+    
+
     return 0;
 }
